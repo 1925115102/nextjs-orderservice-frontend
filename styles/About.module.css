@@ -1,0 +1,23 @@
+.about {
+    background-color: black;
+    color: white;
+    padding: 20px;
+    text-align: center;
+
+    bottom: 200px;
+    position: absolute;
+}
+
+.about h1 {
+    color: white;
+    font-size: 36px;
+    margin-bottom: 20px;
+
+}
+
+.about p {
+    color: white;
+    font-size: 24px;
+    line-height: 1.5;
+
+}
