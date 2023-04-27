@@ -1,12 +1,12 @@
-//let host = process.env.NEXT_PUBLIC_BACKEND_HOST;
-
 let host = "https://orderservice-production-9add.up.railway.app";
 
-// let host = "ep-withered-river-482072.us-east-2.aws.neon.tech";
-
 let findAllOrder = () => {
- return fetch(host + '/orders/findAll')
-        .then(x => x.json()); 
+    return fetch(host + '/orders/findAll')
+        .then(response => response.json())
+        .catch(error => {
+            console.log(error);
+            return null;
+        });
 };
 
 let addNewOrder = (order) => {
@@ -15,57 +15,71 @@ let addNewOrder = (order) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            customerId: order.customerId,
-            total: order.total,
-            shippingAddress: order.shippingAddress,
-            items: order.items,
-            payment: order.payment
+        body: JSON.stringify(order)
+    })
+        .then(response => {
+            if (response.status === 200 || response.status === 201) {
+                return response.json();
+            } else {
+                throw new Error('Failed to add the order.');
+            }
         })
-    }).then(response => {
-        if (response.status == 200 || response.status == 201) return response.json();
-        return null;
-    }).then(id => id)
         .catch(error => {
             console.log(error);
-            return null;
+            throw error;
         });
 };
 
-const shippingAddress = {
-    state: "",
-    city: "",
-    postalCode: ""
-};
-
-const items = [
-    {
-        name: "",
-        quantity: 0,
-        price: 0
+const order = {
+    customerId: "12345",
+    total: 100,
+    shippingAddress: {
+        state: "California",
+        city: "Los Angeles",
+        postalCode: "90001"
     },
-    {
-        name: "",
-        quantity: 0,
-        price: 0
-    }
-];
-
-const payment = {
-    method: "",
-    number: "",
-    billingAddress: {
-        state: "",
-        city: "",
-        postalCode: ""
+    items: [
+        {
+            name: "Item 1",
+            quantity: 2,
+            price: 10
+        },
+        {
+            name: "Item 2",
+            quantity: 1,
+            price: 20
+        }
+    ],
+    payment: {
+        method: "Credit Card",
+        number: "**** **** **** 1234",
+        billingAddress: {
+            state: "California",
+            city: "Los Angeles",
+            postalCode: "90001"
+        }
     }
 };
 
+// Call the addNewOrder function with the order object
+addNewOrder(order)
+    .then(result => {
+        console.log("Order added successfully:", result);
+    })
+    .catch(error => {
+        console.log("Failed to add the order:", error);
+    });
 
 let data = {
-    orders: findAllOrder,
-    addNewOrder: addNewOrder
+    orders: findAllOrder
 };
 
-export default data;
-export { addNewOrder, shippingAddress, items, payment };
+let dataArray = [];
+
+for (let [key, value] of Object.entries(data)) {
+    if (typeof value === 'function') {
+        dataArray.push({ name: key, function: value });
+    }
+}
+
+export default dataArray;
